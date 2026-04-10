@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBG Tracker — Pantau Makan Bergizi Gratis</title>
+    <meta name="description" content="Sistem gamifikasi pengecekan konsumsi Makan Bergizi Gratis (MBG) untuk siswa. Deteksi, lacak, dan kompetisi antar kelas!">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========== SCREEN: LOGIN ========== -->
+    <section id="screen-login" class="screen active">
+        <div class="screen-center">
+            <div class="auth-card card card-lavender">
+                <div class="auth-logo">🍱</div>
+                <h1 class="auth-title">MBG Tracker</h1>
+                <p class="auth-subtitle">Pantau konsumsi Makan Bergizi Gratis kamu!</p>
+
+                <form id="login-form" class="auth-form" autocomplete="off">
+                    <div class="input-group">
+                        <label for="login-username">👤 Username</label>
+                        <input type="text" id="login-username" placeholder="Masukkan username..." required>
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">🔒 Password</label>
+                        <input type="password" id="login-password" placeholder="Masukkan password..." required>
+                    </div>
+                    <div id="login-error" class="error-msg hidden"></div>
+                    <button type="submit" class="btn btn-primary btn-full">Masuk →</button>
+                </form>
+
+                <p class="auth-switch">Belum punya akun? <a href="#" id="go-register">Daftar di sini</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: REGISTER ========== -->
+    <section id="screen-register" class="screen">
+        <div class="screen-center">
+            <div class="auth-card card card-green">
+                <div class="auth-logo">📝</div>
+                <h1 class="auth-title">Buat Akun</h1>
+                <p class="auth-subtitle">Daftarkan diri kamu untuk mulai tracking!</p>
+
+                <form id="register-form" class="auth-form" autocomplete="off">
+                    <div class="input-group">
+                        <label for="reg-username">👤 Username</label>
+                        <input type="text" id="reg-username" placeholder="Buat username unik..." required>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-password">🔒 Password</label>
+                        <input type="password" id="reg-password" placeholder="Buat password..." required>
+                    </div>
+                    <div id="register-error" class="error-msg hidden"></div>
+                    <button type="submit" class="btn btn-primary btn-full">Daftar →</button>
+                </form>
+
+                <p class="auth-switch">Sudah punya akun? <a href="#" id="go-login">Masuk di sini</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: ONBOARDING ========== -->
+    <section id="screen-onboarding" class="screen">
+        <div class="screen-center">
+            <div class="onboard-card card card-pink">
+                <div class="step-dots">
+                    <span class="dot active" data-step="1"></span>
+                    <span class="dot" data-step="2"></span>
+                    <span class="dot" data-step="3"></span>
+                </div>
+
+                <!-- Step 1: Name -->
+                <div id="onboard-step-1" class="onboard-step">
+                    <div class="onboard-emoji">👋</div>
+                    <h2>Hai! Siapa nama kamu?</h2>
+                    <p class="onboard-desc">Nama ini akan muncul di profil kamu</p>
+                    <div class="input-group">
+                        <input type="text" id="onboard-nama" placeholder="Nama lengkap kamu..." maxlength="30">
+                    </div>
+                    <button class="btn btn-primary btn-full" id="onboard-next-1">Lanjut →</button>
+                </div>
+
+                <!-- Step 2: Class -->
+                <div id="onboard-step-2" class="onboard-step hidden">
+                    <div class="onboard-emoji">🏫</div>
+                    <h2>Kamu kelas apa?</h2>
+                    <p class="onboard-desc">Pilih kelas kamu saat ini</p>
+                    <div class="class-grid" id="class-grid"></div>
+                    <button class="btn btn-primary btn-full" id="onboard-next-2">Lanjut →</button>
+                </div>
+
+                <!-- Step 3: Avatar -->
+                <div id="onboard-step-3" class="onboard-step hidden">
+                    <div class="onboard-emoji">🎨</div>
+                    <h2>Pilih avatar kamu!</h2>
+                    <p class="onboard-desc">Ekspresikan diri kamu</p>
+                    <div class="avatar-grid" id="avatar-grid"></div>
+                    <button class="btn btn-primary btn-full" id="onboard-finish">Selesai! 🎉</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: DASHBOARD ========== -->
+    <section id="screen-dashboard" class="screen">
+        <div class="container">
+            <header class="dash-header">
+                <div class="user-info">
+                    <div class="user-avatar-circle" id="dash-avatar">😎</div>
+                    <div>
+                        <h2 class="dash-greeting" id="dash-greeting">Hai, Siswa! 👋</h2>
+                        <p class="dash-kelas" id="dash-kelas">XII RPL C</p>
+                    </div>
+                </div>
+                <button class="btn-icon" id="btn-logout" title="Keluar">🚪</button>
+            </header>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card card-mini">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="stat-streak">0</span>
+                    <span class="stat-label">Streak</span>
+                </div>
+                <div class="stat-card card-mini">
+                    <span class="stat-icon">📸</span>
+                    <span class="stat-value" id="stat-scans">0</span>
+                    <span class="stat-label">Total Scan</span>
+                </div>
+                <div class="stat-card card-mini">
+                    <span class="stat-icon">📅</span>
+                    <span class="stat-value" id="stat-weekly">0</span>
+                    <span class="stat-label">Minggu Ini</span>
+                </div>
+            </div>
+
+            <!-- Weekly Insight Banner -->
+            <div class="insight-banner card card-blue">
+                <div class="insight-left">
+                    <span class="insight-icon">📊</span>
+                    <div>
+                        <strong>Insight Minggu Ini</strong>
+                        <p id="insight-text">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="menu-grid">
+                <div class="menu-card card card-green" id="menu-gizi">
+                    <div class="menu-badge-soon">Coming Soon</div>
+                    <span class="menu-icon">🥗</span>
+                    <h3>Deteksi Gizi</h3>
+                    <p>Analisis kandungan gizi harian kamu</p>
+                </div>
+                <div class="menu-card card card-blue" id="menu-mbg">
+                    <span class="menu-icon">📸</span>
+                    <h3>Deteksi MBG</h3>
+                    <p>Foto ompreng dan lihat hasilnya!</p>
+                </div>
+                <div class="menu-card card card-yellow" id="menu-leaderboard">
+                    <span class="menu-icon">🏆</span>
+                    <h3>Leaderboard</h3>
+                    <p>Peringkat kelas minggu ini</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: DETEKSI MBG ========== -->
+    <section id="screen-deteksi-mbg" class="screen">
+        <div class="container">
+            <header class="page-header">
+                <button class="btn-back" id="btn-back-mbg">← Kembali</button>
+                <h2>📸 Deteksi MBG</h2>
+            </header>
+
+            <div class="mbg-card card card-blue">
+                <p class="mbg-instruction">Arahkan kamera ke ompreng MBG kamu, lalu tekan <strong>Capture</strong>!</p>
+
+                <div class="camera-wrapper" id="camera-wrapper">
+                    <div class="camera-placeholder" id="camera-placeholder">
+                        <span>📷</span>
+                        <p>Kamera Belum Aktif</p>
+                    </div>
+                    <div id="webcam-container"></div>
+                </div>
+
+                <div class="mbg-actions">
+                    <button class="btn btn-secondary btn-full" id="btn-start-cam">Nyalakan Kamera 📹</button>
+                    <button class="btn btn-primary btn-full hidden" id="btn-capture">Capture MBG! 📸</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: LEADERBOARD ========== -->
+    <section id="screen-leaderboard" class="screen">
+        <div class="container">
+            <header class="page-header">
+                <button class="btn-back" id="btn-back-lb">← Kembali</button>
+                <h2>🏆 Leaderboard Mingguan</h2>
+            </header>
+
+            <p class="lb-subtitle">Peringkat kelas dengan MBG habis terbanyak minggu ini.<br>Top 3 dapat <strong>🎁 Reward dari OSIS!</strong></p>
+
+            <!-- Podium Top 3 -->
+            <div class="podium" id="podium">
+                <div class="podium-item second" id="pod-2">
+                    <div class="podium-medal">🥈</div>
+                    <div class="podium-class">-</div>
+                    <div class="podium-score">0</div>
+                    <div class="podium-bar bar-silver"></div>
+                </div>
+                <div class="podium-item first" id="pod-1">
+                    <div class="podium-medal">🥇</div>
+                    <div class="podium-class">-</div>
+                    <div class="podium-score">0</div>
+                    <div class="podium-bar bar-gold"></div>
+                </div>
+                <div class="podium-item third" id="pod-3">
+                    <div class="podium-medal">🥉</div>
+                    <div class="podium-class">-</div>
+                    <div class="podium-score">0</div>
+                    <div class="podium-bar bar-bronze"></div>
+                </div>
+            </div>
+
+            <!-- Full List -->
+            <div class="lb-list-card card card-yellow">
+                <h3>📋 Semua Kelas</h3>
+                <ul id="lb-full-list" class="lb-list"></ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCREEN: DETEKSI GIZI (Coming Soon) ========== -->
+    <section id="screen-deteksi-gizi" class="screen">
+        <div class="screen-center">
+            <div class="coming-soon-card card card-green">
+                <div class="cs-emoji">🥗🔬</div>
+                <h2>Deteksi Gizi</h2>
+                <p class="cs-desc">Fitur ini sedang dalam pengembangan.<br>Nanti kamu bisa melihat insight mingguan gizi kamu!</p>
+
+                <div class="cs-features">
+                    <div class="cs-feature"><span>📊</span> Analisis kandungan gizi harian</div>
+                    <div class="cs-feature"><span>📅</span> Ringkasan mingguan terpenuhi/tidak</div>
+                    <div class="cs-feature"><span>🤖</span> Deteksi otomatis via kamera AI</div>
+                </div>
+
+                <button class="btn btn-secondary btn-full" id="btn-back-gizi">← Kembali ke Dashboard</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MODAL: LOADING ========== -->
+    <div class="overlay hidden" id="loading-overlay">
+        <div class="loading-modal card card-blue">
+            <div class="loading-progress-wrap">
+                <div class="loading-progress-bar" id="loading-bar"></div>
+            </div>
+            <div class="loading-emoji" id="loading-emoji">🔍</div>
+            <h3 id="loading-title">Memindai ompreng...</h3>
+            <p id="loading-sub">Tunggu sebentar ya...</p>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: RESULT ========== -->
+    <div class="overlay hidden" id="result-overlay">
+        <div class="result-modal card" id="result-card">
+            <div class="result-emoji" id="result-emoji">🍽️</div>
+            <h3 id="result-status">Status</h3>
+            <p id="result-desc">Deskripsi</p>
+            <div class="result-points hidden" id="result-points">
+                <span>+1</span> poin untuk kelas kamu!
+            </div>
+            <button class="btn btn-dark btn-full" id="btn-close-result">Tutup & Lanjut</button>
+        </div>
+    </div>
+
+    <!-- ========== TOAST ========== -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- ========== CONFETTI CONTAINER ========== -->
+    <div id="confetti-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script src="users.js"></script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
