@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initData();
     bindEvents();
     checkSession();
+    spawnFloatingOrbs();
 });
 
 function bindEvents() {
@@ -38,11 +39,19 @@ function bindEvents() {
     document.getElementById("btn-capture").addEventListener("click", captureAndPredict);
     document.getElementById("btn-back-mbg").addEventListener("click", () => { stopCamera(); showScreen("dashboard"); });
 
+    // Deteksi Gizi (Dummy)
+    document.getElementById("btn-start-cam-gizi").addEventListener("click", startCameraGizi);
+    document.getElementById("btn-capture-gizi").addEventListener("click", captureGiziDummy);
+    document.getElementById("btn-back-gizi").addEventListener("click", () => { stopCameraGizi(); showScreen("dashboard"); });
+
     // Leaderboard
     document.getElementById("btn-back-lb").addEventListener("click", () => showScreen("dashboard"));
 
-    // Gizi Coming Soon
-    document.getElementById("btn-back-gizi").addEventListener("click", () => showScreen("dashboard"));
+    // Insight Modal
+    const btnOpenInsight = document.getElementById("btn-open-insight");
+    if (btnOpenInsight) btnOpenInsight.addEventListener("click", showInsightDummy);
+    const btnCloseInsight = document.getElementById("btn-close-insight");
+    if (btnCloseInsight) btnCloseInsight.addEventListener("click", () => document.getElementById("insight-overlay").classList.add("hidden"));
 
     // Result modal
     document.getElementById("btn-close-result").addEventListener("click", closeResult);
@@ -232,20 +241,185 @@ function renderDashboard() {
     document.getElementById("dash-greeting").textContent = `Hai, ${user.nama || user.username}! 👋`;
     document.getElementById("dash-kelas").textContent = user.kelas || "-";
 
-    document.getElementById("stat-streak").textContent = user.streak || 0;
-    document.getElementById("stat-scans").textContent = user.totalScans || 0;
-
+    const streak = user.streak || 0;
+    const totalScans = user.totalScans || 0;
     const weeklyScans = getUserWeeklyScans(user.id);
-    document.getElementById("stat-weekly").textContent = weeklyScans.length;
+
+    // Animate stat counters
+    animateCounter("stat-streak", streak);
+    animateCounter("stat-scans", totalScans);
+    animateCounter("stat-weekly", weeklyScans.length);
+
+    // XP & Level system
+    const xp = totalScans;
+    const level = Math.floor(xp / 10) + 1;
+    const xpInLevel = xp % 10;
+    const xpNeeded = 10;
+    const xpPercent = (xpInLevel / xpNeeded) * 100;
+
+    document.getElementById("xp-level").textContent = level;
+    document.getElementById("xp-text").textContent = `${xpInLevel} / ${xpNeeded} XP`;
+    setTimeout(() => {
+        document.getElementById("xp-bar").style.width = xpPercent + "%";
+    }, 300);
+
+    // Achievement badges
+    renderBadges(user, streak, totalScans, weeklyScans.length);
 
     // Insight
-    const stats = getWeeklyStats();
     const insightEl = document.getElementById("insight-text");
-    if (stats.total > 0) {
-        insightEl.textContent = `${stats.percentage}% MBG habis dari ${stats.total} scan total minggu ini`;
-    } else {
-        insightEl.textContent = "Belum ada data scan minggu ini";
+    insightEl.textContent = "Tap lihat total kalori & rapormu minggu ini!";
+}
+
+function showInsightDummy() {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    document.getElementById("insight-kelas-name").textContent = user.kelas || "-";
+    document.getElementById("insight-overlay").classList.remove("hidden");
+}
+
+function animateCounter(elementId, targetValue) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const current = parseInt(el.textContent) || 0;
+    if (current === targetValue) return;
+
+    const duration = 800;
+    const steps = 30;
+    const increment = (targetValue - current) / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+        step++;
+        const val = Math.round(current + increment * step);
+        el.textContent = val;
+        if (step >= steps) {
+            el.textContent = targetValue;
+            clearInterval(timer);
+        }
+    }, duration / steps);
+}
+
+function renderBadges(user, streak, totalScans, weeklyScanCount) {
+    const container = document.getElementById("achievement-badges");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const badges = [];
+    if (streak >= 3) badges.push({ icon: "🔥", label: `Streak ${streak}!` });
+    if (streak >= 7) badges.push({ icon: "⭐", label: "On Fire!" });
+    if (totalScans >= 5) badges.push({ icon: "📷", label: "Scanner" });
+    if (totalScans >= 20) badges.push({ icon: "🌟", label: "Pro Scanner" });
+    if (weeklyScanCount >= 3) badges.push({ icon: "🎯", label: "Rajin!" });
+    if (totalScans >= 50) badges.push({ icon: "💎", label: "Legend" });
+
+    badges.forEach((b, i) => {
+        const span = document.createElement("span");
+        span.className = "achievement-badge";
+        span.textContent = `${b.icon} ${b.label}`;
+        span.style.animationDelay = (i * 0.1) + "s";
+        container.appendChild(span);
+    });
+}
+
+// ——— Dummy Camera Gizi ———
+let isGiziCameraOn = false;
+
+function startCameraGizi() {
+    const btnStart = document.getElementById("btn-start-cam-gizi");
+    btnStart.classList.add("hidden");
+    
+    document.getElementById("camera-placeholder-gizi").style.display = "none";
+    document.getElementById("webcam-container-gizi").style.display = "block";
+    
+    document.getElementById("btn-capture-gizi").classList.remove("hidden");
+    isGiziCameraOn = true;
+    
+    document.getElementById("camera-wrapper-gizi").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function stopCameraGizi() {
+    isGiziCameraOn = false;
+    document.getElementById("webcam-container-gizi").style.display = "none";
+    document.getElementById("camera-placeholder-gizi").style.display = "";
+    
+    const btnStart = document.getElementById("btn-start-cam-gizi");
+    btnStart.classList.remove("hidden");
+    btnStart.textContent = "Nyalakan Kamera 📹";
+    btnStart.disabled = false;
+    
+    document.getElementById("btn-capture-gizi").classList.add("hidden");
+}
+
+function captureGiziDummy() {
+    if (!isGiziCameraOn) return;
+
+    // Show loading overlay
+    const overlay = document.getElementById("loading-overlay");
+    overlay.classList.remove("hidden");
+    
+    const progressBar = document.getElementById("loading-bar");
+    progressBar.style.width = "0%";
+    
+    const titleEl = document.getElementById("loading-title");
+    const subEl = document.getElementById("loading-sub");
+    const emojiEl = document.getElementById("loading-emoji");
+
+    const messages = [
+        { emoji: "🔍", title: "Memindai makanan...", sub: "Mendeteksi bahan..." },
+        { emoji: "🤖", title: "AI sedang berpikir...", sub: "Menghitung kalori..." },
+        { emoji: "📊", title: "Menganalisis gizi...", sub: "Mengecek protein & karbo..." },
+        { emoji: "✨", title: "Hampir selesai!", sub: "Menyiapkan hasil..." }
+    ];
+
+    for (let i = 0; i < messages.length; i++) {
+        setTimeout(() => {
+            emojiEl.textContent = messages[i].emoji;
+            titleEl.textContent = messages[i].title;
+            subEl.textContent = messages[i].sub;
+            progressBar.style.width = ((i + 1) / messages.length * 100) + "%";
+        }, i * 1000);
     }
+    
+    setTimeout(() => {
+        overlay.classList.add("hidden");
+        progressBar.style.width = "0%";
+        
+        // Show result
+        const dummyFoods = [
+            { emoji: "🍗🍚", name: "Nasi Ayam Bakar", cals: "450 kcal", protein: "28g", carbs: "45g" },
+            { emoji: "🥗🥚", name: "Salad Telur Sayur", cals: "250 kcal", protein: "15g", carbs: "10g" },
+            { emoji: "🍲🍛", name: "Soto Ayam Nasi", cals: "380 kcal", protein: "20g", carbs: "50g" },
+            { emoji: "🐟🥒", name: "Ikan Nila Bakar Lalapan", cals: "320 kcal", protein: "35g", carbs: "12g" },
+            { emoji: "🥪🥛", name: "Roti Isi & Susu", cals: "300 kcal", protein: "12g", carbs: "40g" }
+        ];
+        const food = dummyFoods[Math.floor(Math.random() * dummyFoods.length)];
+        
+        const resultOverlay = document.getElementById("result-overlay");
+        const resultCard = document.getElementById("result-card");
+        document.getElementById("result-emoji").textContent = food.emoji;
+        document.getElementById("result-status").textContent = food.name;
+        document.getElementById("result-desc").innerHTML = `
+            <div style="font-size: 1rem; margin-top: 10px; line-height: 1.6; text-align: left; background: rgba(255,255,255,0.5); padding: 12px; border-radius: 12px; border: 1px dashed rgba(0,0,0,0.1);">
+                <div>🔥 <strong>Kalori:</strong> ${food.cals}</div>
+                <div>💪 <strong>Protein:</strong> ${food.protein}</div>
+                <div>🍚 <strong>Karbo:</strong> ${food.carbs}</div>
+            </div>
+            <div style="margin-top:10px; font-size:0.9rem; color:var(--text-main);">Tetap semangat jaga nutrisi harianmu!</div>
+        `;
+        document.getElementById("result-points").classList.remove("hidden");
+        
+        // Hack: temporarily remove inline background so claymorphism styles show up nice
+        resultCard.style.background = "";
+        // Manually apply background to resultcard to ensure green styling applies nicely or rely on the class. 
+        // We'll just define inline similar to the previous script
+        resultCard.style.background = "linear-gradient(135deg, rgba(209,250,229,0.92), rgba(187,247,208,0.85))";
+        
+        resultOverlay.classList.remove("hidden");
+        
+        fireConfetti();
+    }, 4000);
 }
 
 // ——— Camera & Teachable Machine ———
@@ -381,7 +555,7 @@ function showResult(classLabel) {
         resultEmoji.textContent = "✨🍽️✨";
         resultStatus.textContent = "Piring Kosong!";
         resultDesc.textContent = `Mantap ${user.nama}! MBG kamu habis!`;
-        bgColor = "var(--soft-green)";
+        bgColor = "linear-gradient(135deg, rgba(209,250,229,0.95), rgba(187,247,208,0.9))";
         resultPoints.classList.remove("hidden");
 
         // Record scan
@@ -392,7 +566,7 @@ function showResult(classLabel) {
         resultEmoji.textContent = "🍛";
         resultStatus.textContent = "Makan Setengah!";
         resultDesc.textContent = "Yah, ayo dihabiskan! Makan bergizi itu penting lho!";
-        bgColor = "var(--soft-yellow)";
+        bgColor = "linear-gradient(135deg, #FFF8E1, #FEF3C7)";
         resultPoints.classList.add("hidden");
         addScan(user.id, user.kelas, "setengah");
 
@@ -400,7 +574,7 @@ function showResult(classLabel) {
         resultEmoji.textContent = "🍚😱";
         resultStatus.textContent = "Masih Penuh?!";
         resultDesc.textContent = "Ompreng masih penuh! Sayang banget kalau nggak dimakan.";
-        bgColor = "var(--soft-pink)";
+        bgColor = "linear-gradient(135deg, #FFE4E6, #FECDD3)";
         resultPoints.classList.add("hidden");
         addScan(user.id, user.kelas, "penuh");
 
@@ -408,7 +582,7 @@ function showResult(classLabel) {
         resultEmoji.textContent = "👀";
         resultStatus.textContent = classLabel.charAt(0).toUpperCase() + classLabel.slice(1);
         resultDesc.textContent = "Model mendeteksi status ompreng kamu.";
-        bgColor = "var(--soft-blue)";
+        bgColor = "linear-gradient(135deg, #EFF6FF, #DBEAFE)";
         resultPoints.classList.add("hidden");
         addScan(user.id, user.kelas, classLabel);
     }
@@ -475,25 +649,55 @@ function showToast(msg) {
     }, 2500);
 }
 
-// ——— Confetti ———
+// ——— Confetti — enhanced with sparkles ———
 function fireConfetti() {
     const container = document.getElementById("confetti-container");
-    const colors = ["#FFD43B", "#FF6B6B", "#51CF66", "#339AF0", "#CC5DE8", "#FF922B", "#22B8CF"];
-    const count = 60;
+    const colors = ["#7C5CFC", "#FF6B8A", "#00D4AA", "#FFB347", "#FFD43B", "#CC5DE8", "#22B8CF", "#FF922B"];
+    const count = 80;
 
     for (let i = 0; i < count; i++) {
         const piece = document.createElement("div");
         piece.className = "confetti-piece";
         piece.style.left = Math.random() * 100 + "vw";
         piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDuration = (2 + Math.random() * 2) + "s";
-        piece.style.animationDelay = Math.random() * 0.8 + "s";
-        piece.style.width = (8 + Math.random() * 10) + "px";
-        piece.style.height = (8 + Math.random() * 10) + "px";
-        piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+        piece.style.animationDuration = (2.5 + Math.random() * 2.5) + "s";
+        piece.style.animationDelay = Math.random() * 1 + "s";
+        piece.style.width = (6 + Math.random() * 12) + "px";
+        piece.style.height = (6 + Math.random() * 12) + "px";
+        const shapes = ["50%", "3px", "0"];
+        piece.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+        if (Math.random() > 0.5) {
+            piece.style.boxShadow = `0 0 6px ${piece.style.background}`;
+        }
         container.appendChild(piece);
     }
 
     // Clean up after animation
-    setTimeout(() => { container.innerHTML = ""; }, 4000);
+    setTimeout(() => { container.innerHTML = ""; }, 5000);
+}
+
+// ——— Floating Ambient Orbs ———
+function spawnFloatingOrbs() {
+    const container = document.getElementById("floating-orbs");
+    if (!container) return;
+
+    const orbs = [
+        { color: "#7C5CFC", size: 200, x: 10, y: 20, dur: 15 },
+        { color: "#FF6B8A", size: 160, x: 70, y: 10, dur: 18 },
+        { color: "#00D4AA", size: 180, x: 50, y: 70, dur: 12 },
+        { color: "#FFB347", size: 140, x: 85, y: 60, dur: 20 },
+        { color: "#CC5DE8", size: 120, x: 25, y: 80, dur: 16 },
+    ];
+
+    orbs.forEach(o => {
+        const el = document.createElement("div");
+        el.className = "floating-orb";
+        el.style.width = o.size + "px";
+        el.style.height = o.size + "px";
+        el.style.background = o.color;
+        el.style.left = o.x + "%";
+        el.style.top = o.y + "%";
+        el.style.setProperty("--dur", o.dur + "s");
+        container.appendChild(el);
+    });
 }
