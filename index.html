@@ -121,6 +121,17 @@
                 <button class="btn-icon" id="btn-logout" title="Keluar">🚪</button>
             </header>
 
+            <!-- XP Level Bar -->
+            <div class="xp-bar-container">
+                <div class="xp-bar-label">
+                    <span>⚡ Level <strong id="xp-level">1</strong></span>
+                    <span id="xp-text">0 / 10 XP</span>
+                </div>
+                <div class="xp-bar-track">
+                    <div class="xp-bar-fill" id="xp-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
             <!-- Stats Bar -->
             <div class="stats-bar">
                 <div class="stat-card card-mini">
@@ -140,24 +151,28 @@
                 </div>
             </div>
 
+            <!-- Achievement Badges -->
+            <div id="achievement-badges" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+
             <!-- Weekly Insight Banner -->
-            <div class="insight-banner card card-blue">
+            <div class="insight-banner card card-blue" id="btn-open-insight" style="cursor: pointer;" title="Klik untuk lihat detail gizi!">
                 <div class="insight-left">
                     <span class="insight-icon">📊</span>
                     <div>
-                        <strong>Insight Minggu Ini</strong>
+                        <strong>Insight Asupan Gizi</strong>
                         <p id="insight-text">Loading...</p>
                     </div>
                 </div>
+                <!-- Small indicator -->
+                <div style="margin-left: auto; font-size: 1.2rem; filter: opacity(0.5); font-weight: bold;">›</div>
             </div>
 
             <!-- Menu Grid -->
             <div class="menu-grid">
                 <div class="menu-card card card-green" id="menu-gizi">
-                    <div class="menu-badge-soon">Coming Soon</div>
                     <span class="menu-icon">🥗</span>
                     <h3>Deteksi Gizi</h3>
-                    <p>Analisis kandungan gizi harian kamu</p>
+                    <p>Cek info gizi harian kamu!</p>
                 </div>
                 <div class="menu-card card card-blue" id="menu-mbg">
                     <span class="menu-icon">📸</span>
@@ -240,21 +255,34 @@
         </div>
     </section>
 
-    <!-- ========== SCREEN: DETEKSI GIZI (Coming Soon) ========== -->
+    <!-- ========== SCREEN: DETEKSI GIZI ========== -->
     <section id="screen-deteksi-gizi" class="screen">
-        <div class="screen-center">
-            <div class="coming-soon-card card card-green">
-                <div class="cs-emoji">🥗🔬</div>
-                <h2>Deteksi Gizi</h2>
-                <p class="cs-desc">Fitur ini sedang dalam pengembangan.<br>Nanti kamu bisa melihat insight mingguan gizi kamu!</p>
+        <div class="container">
+            <header class="page-header">
+                <button class="btn-back" id="btn-back-gizi">← Kembali</button>
+                <h2>🥗 Deteksi Gizi</h2>
+            </header>
 
-                <div class="cs-features">
-                    <div class="cs-feature"><span>📊</span> Analisis kandungan gizi harian</div>
-                    <div class="cs-feature"><span>📅</span> Ringkasan mingguan terpenuhi/tidak</div>
-                    <div class="cs-feature"><span>🤖</span> Deteksi otomatis via kamera AI</div>
+            <div class="mbg-card card card-green">
+                <p class="mbg-instruction">Arahkan kamera ke makanan kamu untuk cek <strong>Gizi</strong>!</p>
+
+                <div class="camera-wrapper" id="camera-wrapper-gizi">
+                    <div class="camera-placeholder" id="camera-placeholder-gizi">
+                        <span>📷</span>
+                        <p>Kamera Belum Aktif</p>
+                    </div>
+                    <div id="webcam-container-gizi" style="width: 100%; height: 100%; display: none; border-radius: var(--clay-radius); background: #000; position: relative;">
+                        <!-- Mock Camera Feed -->
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #222;">
+                            <span style="font-size: 3rem;">🍎🍞</span>
+                        </div>
+                    </div>
                 </div>
 
-                <button class="btn btn-secondary btn-full" id="btn-back-gizi">← Kembali ke Dashboard</button>
+                <div class="mbg-actions">
+                    <button class="btn btn-secondary btn-full" id="btn-start-cam-gizi">Nyalakan Kamera 📹</button>
+                    <button class="btn btn-primary btn-full hidden" id="btn-capture-gizi">Analisis Gizi! 🥗</button>
+                </div>
             </div>
         </div>
     </section>
@@ -284,11 +312,62 @@
         </div>
     </div>
 
+    <!-- ========== MODAL: INSIGHT (DUMMY) ========== -->
+    <div class="overlay hidden" id="insight-overlay">
+        <div class="result-modal card card-blue" style="text-align: left;">
+            <div style="text-align: center; font-size: 3rem; margin-bottom: 10px;">📈</div>
+            <h3 style="text-align: center; margin-bottom: 15px;">Rapor Gizi Mingguan</h3>
+            
+            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.6;">
+                <p><strong>🥗 Total Gizi Minggu Ini:</strong></p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px;">
+                    <div style="background: rgba(124,92,252,0.1); padding: 8px; border-radius: 8px;">🔥 Kalori: <strong>14.500</strong> kcal</div>
+                    <div style="background: rgba(124,92,252,0.1); padding: 8px; border-radius: 8px;">💪 Protein: <strong>410g</strong></div>
+                    <div style="background: rgba(124,92,252,0.1); padding: 8px; border-radius: 8px;">🍚 Karbo: <strong>1.2kg</strong></div>
+                    <div style="background: rgba(124,92,252,0.1); padding: 8px; border-radius: 8px;">🥑 Lemak: <strong>250g</strong></div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.95rem;">
+                <p>📸 Total Pindai Gizi: <strong style="color:var(--primary); font-size: 1.1rem;">12 kali</strong></p>
+                <p style="margin-top: 8px;">🏆 Performa Kelas <span id="insight-kelas-name"></span>:</p>
+                <p>Kalian sudah menang <strong>3 kali</strong> minggu ini! Pertahankan!</p>
+            </div>
+
+            <button class="btn btn-dark btn-full" id="btn-close-insight">Tutup</button>
+        </div>
+    </div>
+
     <!-- ========== TOAST ========== -->
     <div id="toast" class="toast hidden"></div>
 
     <!-- ========== CONFETTI CONTAINER ========== -->
     <div id="confetti-container"></div>
+
+    <!-- ========== FLOATING ORBS ========== -->
+    <div id="floating-orbs"></div>
+    <style>
+        #floating-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.15;
+            animation: orbFloat var(--dur, 12s) ease-in-out infinite alternate;
+        }
+        @keyframes orbFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(40px, -30px) scale(1.1); }
+            66%  { transform: translate(-20px, 20px) scale(0.95); }
+            100% { transform: translate(10px, -40px) scale(1.05); }
+        }
+    </style>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
